@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Reservation System - Avadhesh Kumar Shah</title>
+    <style>
+        /* --- PROFESSIONAL UI DESIGN SYSTEM --- */
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-radius: 12px;
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-content h1 { margin: 0; font-size: 1.5rem; font-weight: 800; }
+        .header-content p { margin: 5px 0 0; color: #e0e7ff; font-size: 0.9rem; }
+        
+        .candidate-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+
+        .panel {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            height: fit-content;
+        }
+
+        .input-group { margin-bottom: 1.5rem; }
+        label { display: block; font-weight: 700; margin-bottom: 0.5rem; }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box; 
+        }
+
+        .btn-group { display: flex; flex-direction: column; gap: 0.8rem; }
+        
+        button {
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: var(--primary-color); color: white; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-secondary { background: #f1f5f9; color: var(--text-main); }
+        .btn-outline { background: transparent; border: 2px solid #fca5a5; color: var(--danger-color); }
+
+        .status-log {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-left: 5px solid var(--secondary-color);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            min-height: 40px;
+        }
+        .status-log.success { border-color: var(--success-color); background: #ecfdf5; color: #065f46; }
+        .status-log.error { border-color: var(--danger-color); background: #fef2f2; color: #991b1b; }
+
+        .building-wrapper {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            overflow-x: auto;
+        }
+
+        .building-container { display: flex; gap: 2rem; min-width: 600px; }
+        
+        .lift-shaft {
+            width: 60px;
+            background: #334155;
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .floors-grid { flex: 1; display: flex; flex-direction: column; gap: 1rem; }
+        .floor-row { display: flex; align-items: center; gap: 1rem; }
+        .floor-label { width: 60px; text-align: right; font-weight: 700; color: #94a3b8; }
+        .room-track { display: flex; gap: 0.5rem; background: #f8fafc; padding: 0.5rem; border-radius: 8px; }
+        
+        .room {
+            width: 40px; height: 35px;
+            border-radius: 4px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.75rem;
+            background: white; border: 2px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+        
+        .room.booked { background: #fee2e2; border-color: var(--danger-color); color: var(--danger-color); }
+        .room.selected { background: var(--success-color); border-color: var(--success-color); color: white; transform: scale(1.1); }
+        
+        .legend { display: flex; gap: 1rem; margin-top: 1rem; font-size: 0.85rem; }
+        .dot { width: 12px; height: 12px; border-radius: 2px; display: inline-block; margin-right: 5px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <h1>Hotel Reservation System</h1>
+            <p>Unstop SDE Tech Assessment</p>
+        </div>
+        <div class="candidate-badge">Candidate: Avadhesh Kumar Shah</div>
+    </header>
+
+    <main>
+        <section class="panel">
+            <div class="input-group">
+                <label for="roomCount">Number of Rooms (Max 5)</label>
+                <input type="number" id="roomCount" min="1" max="5" value="1" placeholder="Enter 1-5">
+            </div>
+
+            <div class="btn-group">
+                <button class="btn-primary" onclick="bookRooms()">Book Rooms</button>
+                <button class="btn-secondary" onclick="generateRandom()">Generate Random Occupancy</button>
+                <button class="btn-outline" onclick="resetSystem()">Reset System</button>
+            </div>
+
+            <div id="statusLog" class="status-log">System Ready.</div>
+
+            <div class="legend">
+                <div><span class="dot" style="background:#e2e8f0"></span>Available</div>
+                <div><span class="dot" style="background:#fee2e2; border:1px solid #ef4444"></span>Booked</div>
+                <div><span class="dot" style="background:#10b981"></span>Just Booked</div>
+            </div>
+        </section>
+
+        <section class="building-wrapper">
+            <div class="building-container">
+                <div class="lift-shaft">LIFT</div>
+                <div class="floors-grid" id="grid"></div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        (function() {
+            // --- STATE MANAGEMENT ---
+            let rooms = [];
+            let lastBookedIds = [];
+            const TOTAL_FLOORS = 10;
+
+            // --- INITIALIZATION ---
+            function initHotel() {
+                console.log("Initializing Hotel...");
+                rooms = [];
+                for (let f = 1; f <= TOTAL_FLOORS; f++) {
+                    // Constraint: Floor 10 has 7 rooms, others have 10
+                    let roomCount = (f === 10) ? 7 : 10;
+                    
+                    for (let i = 0; i < roomCount; i++) {
+                        let roomNum = (f * 100) + (i + 1);
+                        rooms.push({
+                            id: `${f}-${i}`,
+                            floor: f,
+                            number: roomNum,
+                            index: i,
+                            isBooked: false
+                        });
+                    }
+                }
+                render();
+                log("System Initialized.", "success");
+            }
+
+            // --- GLOBAL FUNCTIONS (Attached to Window) ---
+            
+            window.bookRooms = function() {
+                const input = document.getElementById('roomCount');
+                if(!input) return;
+                
+                const n = parseInt(input.value);
+
+                // Validation
+                if (isNaN(n) || n < 1 || n > 5) {
+                    log("Error: Please enter a number between 1 and 5.", "error");
+                    return;
+                }
+
+                const availableRooms = rooms.filter(r => !r.isBooked);
+                if (availableRooms.length < n) {
+                    log("Error: Not enough rooms available.", "error");
+                    return;
+                }
+
+                let bestSet = [];
+                let minCost = Infinity;
+                let foundSameFloor = false;
+
+                // Priority 1: Same Floor
+                const floors = {};
+                availableRooms.forEach(r => {
+                    if (!floors[r.floor]) floors[r.floor] = [];
+                    floors[r.floor].push(r);
+                });
+
+                for (const fKey in floors) {
+                    const fRooms = floors[fKey];
+                    fRooms.sort((a, b) => a.index - b.index); // Sort by index
+
+                    if (fRooms.length >= n) {
+                        for (let i = 0; i <= fRooms.length - n; i++) {
+                            const subset = fRooms.slice(i, i + n);
+                            const cost = subset[n-1].index - subset[0].index; // Horizontal distance
+                            if (cost < minCost) {
+                                minCost = cost;
+                                bestSet = subset;
+                                foundSameFloor = true;
+                            }
+                        }
+                    }
+                }
+
+                // Priority 2: Cross Floor
+                if (!foundSameFloor) {
+                    log("Optimizing across floors...", "success");
+                    // Sort by proximity score (Linearized: Floor*2 + Index)
+                    const sortedAvailable = [...availableRooms].sort((a, b) => {
+                        const scoreA = (a.floor * 2) + a.index;
+                        const scoreB = (b.floor * 2) + b.index;
+                        return scoreA - scoreB;
+                    });
+
+                    minCost = Infinity; // Reset for global
+
+                    for (let i = 0; i <= sortedAvailable.length - n; i++) {
+                        const subset = sortedAvailable.slice(i, i + n);
+                        
+                        let maxF = 0, minF = 11, maxI = 0, minI = 11;
+                        subset.forEach(r => {
+                            if (r.floor > maxF) maxF = r.floor;
+                            if (r.floor < minF) minF = r.floor;
+                            if (r.index > maxI) maxI = r.index;
+                            if (r.index < minI) minI = r.index;
+                        });
+
+                        const vCost = (maxF - minF) * 2;
+                        const hCost = (maxI - minI) * 1;
+                        const totalCost = vCost + hCost;
+
+                        if (totalCost < minCost) {
+                            minCost = totalCost;
+                            bestSet = subset;
+                        }
+                    }
+                }
+
+                // Apply Booking
+                if (bestSet.length > 0) {
+                    const selectedIds = bestSet.map(r => r.id);
+                    rooms = rooms.map(r => {
+                        if (selectedIds.includes(r.id)) return { ...r, isBooked: true };
+                        return r;
+                    });
+                    lastBookedIds = selectedIds;
+                    log(`Success! Booked: ${bestSet.map(r => r.number).join(", ")}`, "success");
+                    render();
+                } else {
+                    log("Error: No suitable rooms found.", "error");
+                }
+            };
+
+            window.generateRandom = function() {
+                rooms = rooms.map(r => ({ ...r, isBooked: Math.random() < 0.3 }));
+                lastBookedIds = [];
+                log("Random occupancy generated.", "success");
+                render();
+            };
+
+            window.resetSystem = function() {
+                initHotel();
+                lastBookedIds = [];
+            };
+
+            // --- HELPERS ---
+            function log(msg, type) {
+                const el = document.getElementById('statusLog');
+                if(el) {
+                    el.innerText = msg;
+                    el.className = `status-log ${type || ''}`;
+                }
+            }
+
+            function render() {
+                const container = document.getElementById('grid');
+                if(!container) return;
+                container.innerHTML = '';
+
+                // Render Floor 10 down to 1
+                for (let f = TOTAL_FLOORS; f >= 1; f--) {
+                    const row = document.createElement('div');
+                    row.className = 'floor-row';
+
+                    const label = document.createElement('div');
+                    label.className = 'floor-label';
+                    label.innerText = `Floor ${f}`;
+                    row.appendChild(label);
+
+                    const track = document.createElement('div');
+                    track.className = 'room-track';
+
+                    const floorRooms = rooms.filter(r => r.floor === f).sort((a,b) => a.index - b.index);
+
+                    floorRooms.forEach(r => {
+                        const cell = document.createElement('div');
+                        cell.className = 'room';
+                        cell.innerText = r.number;
+                        if (lastBookedIds.includes(r.id)) cell.classList.add('selected');
+                        else if (r.isBooked) cell.classList.add('booked');
+                        track.appendChild(cell);
+                    });
+
+                    row.appendChild(track);
+                    container.appendChild(row);
+                }
+            }
+
+            // Initialize immediately
+            initHotel();
+
+        })();
+    </script>
+</body>
+</html>
